@@ -3,3 +3,4 @@
 ideas/*/.run/
 *.log
 .DS_Store
+.run-pids/
