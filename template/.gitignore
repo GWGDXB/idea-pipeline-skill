@@ -1,0 +1,5 @@
+.env
+.worktrees/
+ideas/*/.run/
+*.log
+.DS_Store
