@@ -18,7 +18,7 @@ Every command below is `bash <this skill's folder>/scripts/ip.sh <command>` (`he
 
 ## Install (once per machine)
 
-1. If not stated, ask where it should live (default `~/idea-pipeline`) and whether gate pages should also be copied to a Google Drive sync folder (optional, `--drive <path>`).
+1. If the owner is present and has not said, ask where it should live (default `~/idea-pipeline`) and whether gate pages should also be copied to a Google Drive sync folder (optional, `--drive <path>`). Otherwise take the defaults and say so.
 2. `install <dir> [--drive <path>]` copies the bundled pipeline, creates `.env`, runs `git init` + first commit and remembers the location.
 3. Show the doctor output. Claude Code must be logged in (`claude /login`); nothing else is needed.
 4. State the cost once: triage ≈ USD 1–2, Validate USD 10–40, a whole idea USD 30–150 at API list prices (usage, not charges, on a subscription). Per-iteration caps are in `tools/current.md`.
@@ -37,9 +37,9 @@ Every command below is `bash <this skill's folder>/scripts/ip.sh <command>` (`he
 ### Gate flow
 
 1. `show <id> gate` — present the page **in full**. It is one page: never summarise it, never add a score of your own.
-2. AskUserQuestion: the verdict (allowed set below), one question per calibration question on the page, and notes for the next iteration.
+2. AskUserQuestion: the verdict (allowed set below), one question per calibration question on the page, and notes for the next iteration. If the owner's message already contains the verdict and answers, use them as given — the page is still shown first.
 3. `decide <id> <NN> <verdict> --answer "…" --answer "…" --notes "…"` writes the decision file and applies it.
-4. On `go`, `iterate` or `send-back`: `run <id>`. Report the one-line status it prints.
+4. On `go`, `iterate` or `send-back`: `run <id>`. Report the one-line status it prints. The next gate can open minutes later; `gates` shows it the next time the owner speaks (offer a `/loop 20m` of `gates` only if asked).
 
 | Gate | Verdicts |
 | --- | --- |
@@ -53,7 +53,7 @@ Every command below is `bash <this skill's folder>/scripts/ip.sh <command>` (`he
 ## Rules
 
 - Never score, research or judge an idea. Asked "what do you think?": the control room does not judge; offer to show the page again or to put the question into the decision notes.
-- Never run a stage by hand in this chat and never edit files under `ideas/<id>/`. A misbehaving job is reported in the decision notes.
+- Never run a stage by hand in this chat and never edit an idea's files. They live in the idea's worktree, `<pipeline>/.worktrees/<id>/ideas/<id>/` (the paths in `gates` output are relative to that worktree; `show` resolves them). A misbehaving job is reported in the decision notes.
 - `new`, `decide`, `step`, `run`, `advance`, `resume`, `scout` start a nested `claude` or write git state: run them outside any Bash sandbox. A sandbox-killed run marks the idea `failed`.
 - The wrapper refuses to start a second job for the same idea. Do not work around it.
 
@@ -66,3 +66,4 @@ Every command below is `bash <this skill's folder>/scripts/ip.sh <command>` (`he
 | `CAP HIT` in the log | the per-iteration cap stopped it; the next iteration continues; three in a row open gate `B<stage>` |
 | `EXPORT FAILED: DRIVE_DIR unset` on a page | harmless; the page is in the repo; Drive is optional |
 | `BASH_SOURCE[0]: parameter not set` | someone sourced `system/lib/common.sh` in zsh; use `ip.sh` |
+| `Operation not permitted`, `mkstemp failed`, `sysmond`, `Cannot get process list` | the Bash sandbox, not the pipeline; re-run the command outside it. A real failure shows up in `log` and in the idea's progress.md log lines |

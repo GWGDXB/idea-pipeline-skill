@@ -242,7 +242,8 @@ cmd_gates() {
   say "| Idea | Gate | When | Page | Drive |"
   say "$open"
   say ""
-  say "page:  bash scripts/ip.sh show <id> gate    decide:  bash scripts/ip.sh decide <id> <NN> <verdict> --answer \"…\" --notes \"…\""
+  say "Page paths are relative to the idea's worktree .worktrees/<id>/ — read one with:  bash scripts/ip.sh show <id> gate"
+  say "decide:  bash scripts/ip.sh decide <id> <NN> <verdict> --answer \"…\" --notes \"…\""
 }
 
 cmd_show() {
